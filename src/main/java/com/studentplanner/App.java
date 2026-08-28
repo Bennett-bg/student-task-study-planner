@@ -1,3 +1,4 @@
+
 package com.studentplanner;
 
 import java.time.LocalDate;
@@ -8,14 +9,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.CheckBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.layout.HBox;
 
 public class App extends Application {
 
@@ -25,6 +25,7 @@ public class App extends Application {
         BorderPane root = new BorderPane();
 
         VBox sidebar = new VBox();
+        VBox mainContent = new VBox();
 
         Label sidebarTitle = new Label("MONOLITH");
 
@@ -33,6 +34,15 @@ public class App extends Application {
         Button completedButton = new Button("Completed");
         Button settingsButton = new Button("Settings");
 
+        // TODAY BUTTON
+        todayButton.setOnAction(e -> {
+            mainContent.getChildren().clear();
+
+            Label title = new Label("Today's Tasks");
+
+            mainContent.getChildren().add(title);
+        });
+
         sidebar.getChildren().addAll(
                 sidebarTitle,
                 todayButton,
@@ -40,8 +50,6 @@ public class App extends Application {
                 completedButton,
                 settingsButton
         );
-
-        VBox mainContent = new VBox();
 
         Label welcome = new Label("Welcome to Monolith");
         Label tasksTitle = new Label("Today's Tasks");
@@ -79,30 +87,31 @@ public class App extends Application {
         ListView<Task> taskList = new ListView<>();
 
         taskList.getItems().add(task);
+
         taskList.setCellFactory(listView -> new ListCell<Task>() {
 
-    private final CheckBox checkBox = new CheckBox();
+            private final CheckBox checkBox = new CheckBox();
 
-    @Override
-    protected void updateItem(Task task, boolean empty) {
-        super.updateItem(task, empty);
+            @Override
+            protected void updateItem(Task task, boolean empty) {
+                super.updateItem(task, empty);
 
-        if (empty || task == null) {
-            setGraphic(null);
-            setText(null);
-        } else {
-            checkBox.setText(task.toString());
-            checkBox.setSelected(task.isCompleted());
+                if (empty || task == null) {
+                    setGraphic(null);
+                    setText(null);
+                } else {
+                    checkBox.setText(task.toString());
+                    checkBox.setSelected(task.isCompleted());
 
-            checkBox.setOnAction(e ->
-                    task.setCompleted(checkBox.isSelected())
-            );
+                    checkBox.setOnAction(e ->
+                            task.setCompleted(checkBox.isSelected())
+                    );
 
-            setGraphic(checkBox);
-            setText(null);
-        }
-    }
-});
+                    setGraphic(checkBox);
+                    setText(null);
+                }
+            }
+        });
 
         addTaskButton.setOnAction(e -> {
 
@@ -159,3 +168,4 @@ public class App extends Application {
         launch();
     }
 }
+
