@@ -5,7 +5,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -15,25 +14,51 @@ public class App extends Application {
     public void start(Stage stage) {
 
         BorderPane root = new BorderPane();
+        root.getStyleClass().add("root");
 
-        // UI components
-        Sidebar sidebar = new Sidebar();
-        TaskForm taskForm = new TaskForm();
-        TaskListView taskList = new TaskListView();
+        VBox sidebar = new VBox();
+        sidebar.getStyleClass().add("sidebar");
 
-        // Main content
         VBox mainContent = new VBox();
+        mainContent.getStyleClass().add("main-content");
+
+        Label sidebarTitle = new Label("MONOLITH");
+        sidebarTitle.getStyleClass().add("sidebar-title");
+
+        Button todayButton = new Button("Today");
+        Button upcomingButton = new Button("Upcoming");
+        Button completedButton = new Button("Completed");
+        Button settingsButton = new Button("Settings");
+
+        todayButton.getStyleClass().add("sidebar-button");
+        upcomingButton.getStyleClass().add("sidebar-button");
+        completedButton.getStyleClass().add("sidebar-button");
+        settingsButton.getStyleClass().add("sidebar-button");
+
+        sidebar.getChildren().addAll(
+                sidebarTitle,
+                todayButton,
+                upcomingButton,
+                completedButton,
+                settingsButton
+        );
 
         Label welcome = new Label("Welcome to Monolith");
+        welcome.getStyleClass().add("welcome-label");
+
         Label tasksTitle = new Label("Today's Tasks");
+        tasksTitle.getStyleClass().add("page-title");
 
         Button showAddTaskButton = new Button("Add Task");
+        showAddTaskButton.getStyleClass().add("add-task-button");
 
-        // Keep the task form hidden initially
+        TaskForm taskForm = new TaskForm();
+
+        TaskListView taskList = new TaskListView();
+
         taskForm.setVisible(false);
         taskForm.setManaged(false);
 
-        // Show task form
         showAddTaskButton.setOnAction(e -> {
 
             taskForm.setVisible(true);
@@ -43,32 +68,9 @@ public class App extends Application {
             showAddTaskButton.setManaged(false);
         });
 
-        // Save task
-        taskForm.getSaveButton().setOnAction(e -> {
+        taskForm.setOnTaskSaved(task -> {
 
-            if (taskForm.isValid()) {
-
-                Task newTask = new Task(
-                        taskForm.getTaskTitle(),
-                        taskForm.getSubject(),
-                        taskForm.getDueDate(),
-                        taskForm.getPriority()
-                );
-
-                taskList.getItems().add(newTask);
-
-                taskForm.clear();
-
-                taskForm.setVisible(false);
-                taskForm.setManaged(false);
-
-                showAddTaskButton.setVisible(true);
-                showAddTaskButton.setManaged(true);
-            }
-        });
-
-        // Cancel task creation
-        taskForm.getCancelButton().setOnAction(e -> {
+            taskList.getListView().getItems().add(task);
 
             taskForm.clear();
 
@@ -79,24 +81,17 @@ public class App extends Application {
             showAddTaskButton.setManaged(true);
         });
 
-        // Sidebar navigation
-        sidebar.getTodayButton().setOnAction(e -> {
-            tasksTitle.setText("Today's Tasks");
+        taskForm.setOnCancelled(() -> {
+
+            taskForm.clear();
+
+            taskForm.setVisible(false);
+            taskForm.setManaged(false);
+
+            showAddTaskButton.setVisible(true);
+            showAddTaskButton.setManaged(true);
         });
 
-        sidebar.getUpcomingButton().setOnAction(e -> {
-            tasksTitle.setText("Upcoming Tasks");
-        });
-
-        sidebar.getCompletedButton().setOnAction(e -> {
-            tasksTitle.setText("Completed Tasks");
-        });
-
-        sidebar.getSettingsButton().setOnAction(e -> {
-            tasksTitle.setText("Settings");
-        });
-
-        // Main content
         mainContent.getChildren().addAll(
                 welcome,
                 tasksTitle,
@@ -108,8 +103,11 @@ public class App extends Application {
         root.setLeft(sidebar);
         root.setCenter(mainContent);
 
-        // Scene
         Scene scene = new Scene(root, 900, 600);
+
+        scene.getStylesheets().add(
+                getClass().getResource("/style.css").toExternalForm()
+        );
 
         stage.setTitle("Student Task & Study Planner");
         stage.setScene(scene);

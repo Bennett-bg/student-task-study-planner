@@ -13,12 +13,15 @@ public class Sidebar extends VBox {
 
     public Sidebar() {
 
-        Label sidebarTitle = new Label("MONOLITH");
+        getStyleClass().add("sidebar");
 
-        todayButton = new Button("Today");
-        upcomingButton = new Button("Upcoming");
-        completedButton = new Button("Completed");
-        settingsButton = new Button("Settings");
+        Label sidebarTitle = new Label("MONOLITH");
+        sidebarTitle.getStyleClass().add("sidebar-title");
+
+        todayButton = createSidebarButton("Today");
+        upcomingButton = createSidebarButton("Upcoming");
+        completedButton = createSidebarButton("Completed");
+        settingsButton = createSidebarButton("Settings");
 
         getChildren().addAll(
                 sidebarTitle,
@@ -27,6 +30,17 @@ public class Sidebar extends VBox {
                 completedButton,
                 settingsButton
         );
+    }
+
+    private Button createSidebarButton(String text) {
+
+        Button button = new Button(text);
+
+        button.getStyleClass().add("sidebar-button");
+
+        button.setMaxWidth(Double.MAX_VALUE);
+
+        return button;
     }
 
     public Button getTodayButton() {

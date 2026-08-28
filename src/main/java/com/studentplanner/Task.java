@@ -23,6 +23,18 @@ public class Task {
         return title;
     }
 
+    public String getSubject() {
+        return subject;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
     public boolean isCompleted() {
         return completed;
     }
