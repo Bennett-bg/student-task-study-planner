@@ -1,13 +1,20 @@
+
 package com.studentplanner;
 
+import java.time.LocalDate;
+import java.util.function.Consumer;
+
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
-import java.time.LocalDate;
 
 public class TaskForm extends VBox {
 
@@ -19,16 +26,30 @@ public class TaskForm extends VBox {
     private final Button saveButton;
     private final Button cancelButton;
 
+    private Consumer<Task> onTaskSaved;
+    private Runnable onCancelled;
+
     public TaskForm() {
 
+        setSpacing(15);
+        setPadding(new Insets(22));
+        getStyleClass().add("task-form");
+
+        // =========================
+        // INPUTS
+        // =========================
+
         taskInput = new TextField();
-        taskInput.setPromptText("Enter a task");
+        taskInput.setPromptText("Enter task");
+        taskInput.getStyleClass().add("form-input");
 
         subjectInput = new TextField();
-        subjectInput.setPromptText("Enter subject");
+        subjectInput.setPromptText("Enter subject (optional)");
+        subjectInput.getStyleClass().add("form-input");
 
         dueDatePicker = new DatePicker();
         dueDatePicker.setPromptText("Select due date");
+        dueDatePicker.getStyleClass().add("form-input");
 
         priorityBox = new ComboBox<>();
 
@@ -41,60 +62,180 @@ public class TaskForm extends VBox {
         );
 
         priorityBox.setPromptText("Select priority");
+        priorityBox.getStyleClass().add("form-input");
+
+        // =========================
+        // FRIENDLY PRIORITY NAMES
+        // =========================
+
+        priorityBox.setCellFactory(listView -> new ListCell<>() {
+
+            @Override
+            protected void updateItem(Task.Priority priority, boolean empty) {
+
+                super.updateItem(priority, empty);
+
+                if (empty || priority == null) {
+                    setText(null);
+                } else {
+                    setText(formatPriority(priority));
+                }
+            }
+        });
+
+        priorityBox.setButtonCell(new ListCell<>() {
+
+            @Override
+            protected void updateItem(Task.Priority priority, boolean empty) {
+
+                super.updateItem(priority, empty);
+
+                if (empty || priority == null) {
+                    setText(null);
+                } else {
+                    setText(formatPriority(priority));
+                }
+            }
+        });
+
+        // =========================
+        // LABELS
+        // =========================
+
+        Label taskLabel = new Label("TASK");
+        taskLabel.getStyleClass().add("form-label");
+
+        Label subjectLabel = new Label("SUBJECT");
+        subjectLabel.getStyleClass().add("form-label");
+
+        Label dateLabel = new Label("DUE DATE");
+        dateLabel.getStyleClass().add("form-label");
+
+        Label priorityLabel = new Label("PRIORITY");
+        priorityLabel.getStyleClass().add("form-label");
+
+        // =========================
+        // GRID LAYOUT
+        // =========================
+
+        GridPane grid = new GridPane();
+
+        grid.setHgap(18);
+        grid.setVgap(8);
+
+        grid.add(taskLabel, 0, 0);
+        grid.add(subjectLabel, 1, 0);
+
+        grid.add(taskInput, 0, 1);
+        grid.add(subjectInput, 1, 1);
+
+        grid.add(dateLabel, 0, 2);
+        grid.add(priorityLabel, 1, 2);
+
+        grid.add(dueDatePicker, 0, 3);
+        grid.add(priorityBox, 1, 3);
+
+        GridPane.setHgrow(taskInput, javafx.scene.layout.Priority.ALWAYS);
+        GridPane.setHgrow(subjectInput, javafx.scene.layout.Priority.ALWAYS);
+        GridPane.setHgrow(dueDatePicker, javafx.scene.layout.Priority.ALWAYS);
+        GridPane.setHgrow(priorityBox, javafx.scene.layout.Priority.ALWAYS);
+
+        // =========================
+        // BUTTONS
+        // =========================
 
         saveButton = new Button("Save Task");
-        cancelButton = new Button("Cancel");
+        saveButton.getStyleClass().add("form-button");
 
-        HBox formButtons = new HBox();
-        formButtons.getChildren().addAll(
+        cancelButton = new Button("Cancel");
+        cancelButton.getStyleClass().addAll(
+                "form-button",
+                "cancel-button"
+        );
+
+        HBox buttons = new HBox(
+                10,
                 saveButton,
                 cancelButton
         );
 
+        buttons.setAlignment(Pos.CENTER_LEFT);
+
+        // =========================
+        // FORM CONTENT
+        // =========================
+
         getChildren().addAll(
-                taskInput,
-                subjectInput,
-                dueDatePicker,
-                priorityBox,
-                formButtons
+                grid,
+                buttons
         );
+
+        // =========================
+        // EVENTS
+        // =========================
+
+        saveButton.setOnAction(e -> saveTask());
+
+        cancelButton.setOnAction(e -> {
+
+            if (onCancelled != null) {
+                onCancelled.run();
+            }
+        });
     }
 
-    public String getTaskTitle() {
-        return taskInput.getText();
+    private String formatPriority(Task.Priority priority) {
+
+        return switch (priority) {
+
+            case VERY_LOW -> "Very Low";
+            case LOW -> "Low";
+            case MEDIUM -> "Medium";
+            case HIGH -> "High";
+            case URGENT -> "Urgent";
+        };
     }
 
-    public String getSubject() {
-        return subjectInput.getText();
-    }
+    private void saveTask() {
 
-    public LocalDate getDueDate() {
-        return dueDatePicker.getValue();
-    }
+        String title = taskInput.getText().trim();
+        String subject = subjectInput.getText().trim();
 
-    public Task.Priority getPriority() {
-        return priorityBox.getValue();
-    }
+        LocalDate dueDate = dueDatePicker.getValue();
+        Task.Priority priority = priorityBox.getValue();
 
-    public Button getSaveButton() {
-        return saveButton;
-    }
+        if (title.isBlank()
+                || dueDate == null
+                || priority == null) {
+            return;
+        }
 
-    public Button getCancelButton() {
-        return cancelButton;
+        Task newTask = new Task(
+                title,
+                subject,
+                dueDate,
+                priority
+        );
+
+        if (onTaskSaved != null) {
+            onTaskSaved.accept(newTask);
+        }
     }
 
     public void clear() {
+
         taskInput.clear();
         subjectInput.clear();
         dueDatePicker.setValue(null);
         priorityBox.setValue(null);
     }
 
-    public boolean isValid() {
-        return !getTaskTitle().isBlank()
-                && !getSubject().isBlank()
-                && getDueDate() != null
-                && getPriority() != null;
+    public void setOnTaskSaved(Consumer<Task> onTaskSaved) {
+        this.onTaskSaved = onTaskSaved;
+    }
+
+    public void setOnCancelled(Runnable onCancelled) {
+        this.onCancelled = onCancelled;
     }
 }
+
