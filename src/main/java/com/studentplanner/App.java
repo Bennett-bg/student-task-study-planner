@@ -1,17 +1,9 @@
-
 package com.studentplanner;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -24,134 +16,24 @@ public class App extends Application {
 
         BorderPane root = new BorderPane();
 
-        VBox sidebar = new VBox();
+        // UI components
+        Sidebar sidebar = new Sidebar();
+        TaskForm taskForm = new TaskForm();
+        TaskListView taskList = new TaskListView();
+
+        // Main content
         VBox mainContent = new VBox();
-
-        Label sidebarTitle = new Label("MONOLITH");
-
-        Button todayButton = new Button("Today");
-        Button upcomingButton = new Button("Upcoming");
-        Button completedButton = new Button("Completed");
-        Button settingsButton = new Button("Settings");
-
-        // TODAY BUTTON
-        todayButton.setOnAction(e -> {
-            // Today's view will be properly implemented later.
-        });
-
-        sidebar.getChildren().addAll(
-                sidebarTitle,
-                todayButton,
-                upcomingButton,
-                completedButton,
-                settingsButton
-        );
 
         Label welcome = new Label("Welcome to Monolith");
         Label tasksTitle = new Label("Today's Tasks");
 
-        TextField taskInput = new TextField();
-        taskInput.setPromptText("Enter a task");
-
-        TextField subjectInput = new TextField();
-        subjectInput.setPromptText("Enter subject");
-
-        DatePicker dueDatePicker = new DatePicker();
-        dueDatePicker.setPromptText("Select due date");
-
-        ComboBox<Task.Priority> priorityBox = new ComboBox<>();
-
-        priorityBox.getItems().addAll(
-                Task.Priority.VERY_LOW,
-                Task.Priority.LOW,
-                Task.Priority.MEDIUM,
-                Task.Priority.HIGH,
-                Task.Priority.URGENT
-        );
-
-        priorityBox.setPromptText("Select priority");
-
-        Button addTaskButton = new Button("Save Task");
-        Button cancelButton = new Button("Cancel");
-
         Button showAddTaskButton = new Button("Add Task");
 
-        VBox taskForm = new VBox();
-
-        HBox formButtons = new HBox();
-
-        formButtons.getChildren().addAll(
-                addTaskButton,
-                cancelButton
-        );
-
-        taskForm.getChildren().addAll(
-                taskInput,
-                subjectInput,
-                dueDatePicker,
-                priorityBox,
-                formButtons
-        );
-
+        // Keep the task form hidden initially
         taskForm.setVisible(false);
         taskForm.setManaged(false);
 
-        ListView<Task> taskList = new ListView<>();
-
-        taskList.setCellFactory(listView -> new ListCell<Task>() {
-
-            private final CheckBox checkBox = new CheckBox();
-            private final Button deleteButton = new Button("Delete");
-            private final HBox taskRow = new HBox();
-
-            {
-                taskRow.getChildren().addAll(
-                        checkBox,
-                        deleteButton
-                );
-            }
-
-            @Override
-            protected void updateItem(Task task, boolean empty) {
-                super.updateItem(task, empty);
-
-                if (empty || task == null) {
-                    setGraphic(null);
-                    setText(null);
-                } else {
-
-                    checkBox.setText(task.toString());
-                    checkBox.setSelected(task.isCompleted());
-
-                    checkBox.setOnAction(e ->
-                            task.setCompleted(checkBox.isSelected())
-                    );
-
-                    deleteButton.setOnAction(e -> {
-
-                        Alert confirmation = new Alert(
-                                Alert.AlertType.CONFIRMATION
-                        );
-
-                        confirmation.setTitle("Delete Task");
-                        confirmation.setHeaderText("Delete this task?");
-                        confirmation.setContentText(task.toString());
-
-                        confirmation.showAndWait().ifPresent(response -> {
-
-                            if (response == javafx.scene.control.ButtonType.OK) {
-                                taskList.getItems().remove(task);
-                            }
-
-                        });
-                    });
-
-                    setGraphic(taskRow);
-                    setText(null);
-                }
-            }
-        });
-
+        // Show task form
         showAddTaskButton.setOnAction(e -> {
 
             taskForm.setVisible(true);
@@ -161,33 +43,21 @@ public class App extends Application {
             showAddTaskButton.setManaged(false);
         });
 
-        addTaskButton.setOnAction(e -> {
+        // Save task
+        taskForm.getSaveButton().setOnAction(e -> {
 
-            String title = taskInput.getText();
-            String subject = subjectInput.getText();
-
-            var dueDate = dueDatePicker.getValue();
-
-            Task.Priority priority = priorityBox.getValue();
-
-            if (!title.isBlank()
-                    && !subject.isBlank()
-                    && dueDate != null
-                    && priority != null) {
+            if (taskForm.isValid()) {
 
                 Task newTask = new Task(
-                        title,
-                        subject,
-                        dueDate,
-                        priority
+                        taskForm.getTaskTitle(),
+                        taskForm.getSubject(),
+                        taskForm.getDueDate(),
+                        taskForm.getPriority()
                 );
 
                 taskList.getItems().add(newTask);
 
-                taskInput.clear();
-                subjectInput.clear();
-                dueDatePicker.setValue(null);
-                priorityBox.setValue(null);
+                taskForm.clear();
 
                 taskForm.setVisible(false);
                 taskForm.setManaged(false);
@@ -197,12 +67,10 @@ public class App extends Application {
             }
         });
 
-        cancelButton.setOnAction(e -> {
+        // Cancel task creation
+        taskForm.getCancelButton().setOnAction(e -> {
 
-            taskInput.clear();
-            subjectInput.clear();
-            dueDatePicker.setValue(null);
-            priorityBox.setValue(null);
+            taskForm.clear();
 
             taskForm.setVisible(false);
             taskForm.setManaged(false);
@@ -211,6 +79,24 @@ public class App extends Application {
             showAddTaskButton.setManaged(true);
         });
 
+        // Sidebar navigation
+        sidebar.getTodayButton().setOnAction(e -> {
+            tasksTitle.setText("Today's Tasks");
+        });
+
+        sidebar.getUpcomingButton().setOnAction(e -> {
+            tasksTitle.setText("Upcoming Tasks");
+        });
+
+        sidebar.getCompletedButton().setOnAction(e -> {
+            tasksTitle.setText("Completed Tasks");
+        });
+
+        sidebar.getSettingsButton().setOnAction(e -> {
+            tasksTitle.setText("Settings");
+        });
+
+        // Main content
         mainContent.getChildren().addAll(
                 welcome,
                 tasksTitle,
@@ -222,6 +108,7 @@ public class App extends Application {
         root.setLeft(sidebar);
         root.setCenter(mainContent);
 
+        // Scene
         Scene scene = new Scene(root, 900, 600);
 
         stage.setTitle("Student Task & Study Planner");
@@ -233,4 +120,3 @@ public class App extends Application {
         launch();
     }
 }
-
