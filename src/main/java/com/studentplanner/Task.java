@@ -23,6 +23,10 @@ public class Task {
         return title;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
     public String getSubject() {
         return subject;
     }
@@ -39,34 +43,26 @@ public class Task {
         return completed;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }
-    //Add the getters here
-    public String getTitle(){
-        return title;
-    }
-    public String getSubject(){
-        return subject;
-    }
-    public LocalDate getDueDate(){
-        return dueDate;
-    }
-    public Priority getPriority(){
-        return priority;
-    }
-    public void setTitle(String title){
-        this.title = title;
-    }
-    public void setSubject(String subject){
-        this.subject = subject;
-    }
-    public void setDueDate(LocalDate dueDate){
-        this.dueDate = dueDate;
-    }
-    public void setPriority(Priority priority){
-        this.priority = priority;
-    }
+
     public enum Priority {
         VERY_LOW,
         LOW,
