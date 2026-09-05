@@ -3,118 +3,53 @@ package com.studentplanner;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class App extends Application {
 
-    @Override
-    public void start(Stage stage) {
+@Override
+public void start(Stage stage) {
 
-        BorderPane root = new BorderPane();
-        root.getStyleClass().add("root");
+    BorderPane root = new BorderPane();
 
-        VBox sidebar = new VBox();
-        sidebar.getStyleClass().add("sidebar");
+    Sidebar sidebar = new Sidebar();
+    MainContent mainContent = new MainContent();
 
-        VBox mainContent = new VBox();
-        mainContent.getStyleClass().add("main-content");
+    sidebar.getTodayButton().setOnAction(e ->
+            mainContent.showToday()
+    );
 
-        Label sidebarTitle = new Label("MONOLITH");
-        sidebarTitle.getStyleClass().add("sidebar-title");
+    sidebar.getUpcomingButton().setOnAction(e ->
+            mainContent.showUpcoming()
+    );
 
-        Button todayButton = new Button("Today");
-        Button upcomingButton = new Button("Upcoming");
-        Button completedButton = new Button("Completed");
-        Button settingsButton = new Button("Settings");
+    sidebar.getCompletedButton().setOnAction(e ->
+            mainContent.showCompleted()
+    );
 
-        todayButton.getStyleClass().add("sidebar-button");
-        upcomingButton.getStyleClass().add("sidebar-button");
-        completedButton.getStyleClass().add("sidebar-button");
-        settingsButton.getStyleClass().add("sidebar-button");
+    sidebar.getSettingsButton().setOnAction(e ->
+            mainContent.showSettings()
+    );
 
-        sidebar.getChildren().addAll(
-                sidebarTitle,
-                todayButton,
-                upcomingButton,
-                completedButton,
-                settingsButton
-        );
+    mainContent.setupTaskSection();
 
-        Label welcome = new Label("Welcome to Monolith");
-        welcome.getStyleClass().add("welcome-label");
+    root.setLeft(sidebar);
+    root.setCenter(mainContent);
 
-        Label tasksTitle = new Label("Today's Tasks");
-        tasksTitle.getStyleClass().add("page-title");
+    Scene scene = new Scene(root, 900, 600);
 
-        Button showAddTaskButton = new Button("Add Task");
-        showAddTaskButton.getStyleClass().add("add-task-button");
+    scene.getStylesheets().add(
+            getClass().getResource("/style.css").toExternalForm()
+    );
 
-        TaskForm taskForm = new TaskForm();
+    stage.setTitle("Student Task & Study Planner");
+    stage.setScene(scene);
+    stage.show();
+}
 
-        TaskListView taskList = new TaskListView();
+public static void main(String[] args) {
+    launch();
+}
 
-        taskForm.setVisible(false);
-        taskForm.setManaged(false);
-
-        showAddTaskButton.setOnAction(e -> {
-
-            taskForm.setVisible(true);
-            taskForm.setManaged(true);
-
-            showAddTaskButton.setVisible(false);
-            showAddTaskButton.setManaged(false);
-        });
-
-        taskForm.setOnTaskSaved(task -> {
-
-            taskList.getListView().getItems().add(task);
-
-            taskForm.clear();
-
-            taskForm.setVisible(false);
-            taskForm.setManaged(false);
-
-            showAddTaskButton.setVisible(true);
-            showAddTaskButton.setManaged(true);
-        });
-
-        taskForm.setOnCancelled(() -> {
-
-            taskForm.clear();
-
-            taskForm.setVisible(false);
-            taskForm.setManaged(false);
-
-            showAddTaskButton.setVisible(true);
-            showAddTaskButton.setManaged(true);
-        });
-
-        mainContent.getChildren().addAll(
-                welcome,
-                tasksTitle,
-                showAddTaskButton,
-                taskForm,
-                taskList
-        );
-
-        root.setLeft(sidebar);
-        root.setCenter(mainContent);
-
-        Scene scene = new Scene(root, 900, 600);
-
-        scene.getStylesheets().add(
-                getClass().getResource("/style.css").toExternalForm()
-        );
-
-        stage.setTitle("Student Task & Study Planner");
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    public static void main(String[] args) {
-        launch();
-    }
 }
