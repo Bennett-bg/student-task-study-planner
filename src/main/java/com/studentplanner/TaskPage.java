@@ -1,5 +1,8 @@
 package com.studentplanner;
 
+import java.util.List;
+import java.util.function.Supplier;
+
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -13,12 +16,16 @@ public class TaskPage extends VBox {
     private final Button showAddTaskButton;
     private final TaskForm taskForm;
 
+    private final Supplier<List<Task>> taskSupplier;
+
     public TaskPage(
             TaskManager taskManager,
-            String title
+            String title,
+            Supplier<List<Task>> taskSupplier
     ) {
 
         this.taskManager = taskManager;
+        this.taskSupplier = taskSupplier;
 
         setSpacing(15);
         setPadding(new Insets(0));
@@ -43,6 +50,7 @@ public class TaskPage extends VBox {
         );
 
         setupTaskSection();
+        refreshTasks();
     }
 
     private void setupTaskSection() {
@@ -60,8 +68,6 @@ public class TaskPage extends VBox {
 
             taskManager.addTask(task);
 
-            taskList.getListView().getItems().add(task);
-
             taskForm.clear();
 
             taskForm.setVisible(false);
@@ -69,6 +75,8 @@ public class TaskPage extends VBox {
 
             showAddTaskButton.setVisible(true);
             showAddTaskButton.setManaged(true);
+
+            refreshTasks();
         });
 
         taskForm.setOnCancelled(() -> {
@@ -81,6 +89,13 @@ public class TaskPage extends VBox {
             showAddTaskButton.setVisible(true);
             showAddTaskButton.setManaged(true);
         });
+    }
+
+    public void refreshTasks() {
+
+        taskList.getListView().getItems().setAll(
+                taskSupplier.get()
+        );
     }
 
     public TaskListView getTaskList() {

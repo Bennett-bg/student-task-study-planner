@@ -114,11 +114,10 @@ public class TaskListView extends VBox {
 
                     checkBox.setOnAction(e -> {
 
-                        if (checkBox.isSelected()) {
-                            taskManager.completeTask(task);
-                        } else {
-                            task.setCompleted(false);
-                        }
+                        taskManager.setTaskCompleted(
+                                task,
+                                checkBox.isSelected()
+                        );
 
                         updateTitleStyle(
                                 taskTitle,

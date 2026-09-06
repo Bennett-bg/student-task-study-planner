@@ -11,7 +11,7 @@ public class TaskManagerTest {
     void testAddTask() {
 
         // Create a TaskManager
-        TaskManager manager = new TaskManager();
+        TaskManager manager = new TaskManager(true);
 
         // Create a task
         Task task = new Task(
@@ -35,7 +35,7 @@ public class TaskManagerTest {
     void testCompleteTask() {
 
         // Create a TaskManager
-        TaskManager manager = new TaskManager();
+        TaskManager manager = new TaskManager(true);
 
         // Create a task
         Task task = new Task(
@@ -59,7 +59,7 @@ public class TaskManagerTest {
     void testGetCompletedTasks() {
 
         // Create a TaskManager
-        TaskManager manager = new TaskManager();
+        TaskManager manager = new TaskManager(true);
 
         // Create two tasks
         Task task1 = new Task(
@@ -94,7 +94,7 @@ public class TaskManagerTest {
     void testGetTodayTasks() {
 
         // Create a TaskManager
-        TaskManager manager = new TaskManager();
+        TaskManager manager = new TaskManager(true);
 
         // Create a task that is due today
         Task todayTask = new Task(
@@ -118,7 +118,7 @@ public class TaskManagerTest {
     void testGetUpcomingTasks() {
 
         // Create a TaskManager
-        TaskManager manager = new TaskManager();
+        TaskManager manager = new TaskManager(true);
 
         // Create a task that is due tomorrow
         Task upcomingTask = new Task(
@@ -142,7 +142,7 @@ public class TaskManagerTest {
     void testRemoveTask() {
 
         // Create a TaskManager
-        TaskManager manager = new TaskManager();
+        TaskManager manager = new TaskManager(true);
 
         // Create a task
         Task task = new Task(

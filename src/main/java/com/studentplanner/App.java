@@ -2,54 +2,56 @@ package com.studentplanner;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class App extends Application {
 
-@Override
-public void start(Stage stage) {
+    @Override
+    public void start(Stage stage) {
 
-    BorderPane root = new BorderPane();
+        BorderPane root = new BorderPane();
 
-    Sidebar sidebar = new Sidebar();
-    MainContent mainContent = new MainContent();
+        Sidebar sidebar = new Sidebar();
+        MainContent mainContent = new MainContent();
 
-    sidebar.getTodayButton().setOnAction(e ->
-            mainContent.showToday()
-    );
+        sidebar.getHomeButton().setOnAction(e ->
+                mainContent.showDashboard()
+        );
 
-    sidebar.getUpcomingButton().setOnAction(e ->
-            mainContent.showUpcoming()
-    );
+        sidebar.getTodayButton().setOnAction(e ->
+                mainContent.showToday()
+        );
 
-    sidebar.getCompletedButton().setOnAction(e ->
-            mainContent.showCompleted()
-    );
+        sidebar.getUpcomingButton().setOnAction(e ->
+                mainContent.showUpcoming()
+        );
 
-    sidebar.getSettingsButton().setOnAction(e ->
-            mainContent.showSettings()
-    );
+        sidebar.getCompletedButton().setOnAction(e ->
+                mainContent.showCompleted()
+        );
 
-    mainContent.setupTaskSection();
+        sidebar.getSettingsButton().setOnAction(e ->
+                mainContent.showSettings()
+        );
 
-    root.setLeft(sidebar);
-    root.setCenter(mainContent);
+        mainContent.setupTaskSection();
 
-    Scene scene = new Scene(root, 900, 600);
+        root.setLeft(sidebar);
+        root.setCenter(mainContent);
 
-    scene.getStylesheets().add(
-            getClass().getResource("/style.css").toExternalForm()
-    );
+        Scene scene = new Scene(root, 900, 600);
 
-    stage.setTitle("Student Task & Study Planner");
-    stage.setScene(scene);
-    stage.show();
-}
+        scene.getStylesheets().add(
+                getClass().getResource("/style.css").toExternalForm()
+        );
 
-public static void main(String[] args) {
-    launch();
-}
+        stage.setTitle("Student Task & Study Planner");
+        stage.setScene(scene);
+        stage.show();
+    }
 
+    public static void main(String[] args) {
+        launch();
+    }
 }
