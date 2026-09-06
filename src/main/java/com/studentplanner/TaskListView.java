@@ -1,4 +1,3 @@
-
 package com.studentplanner;
 
 import java.time.format.DateTimeFormatter;
@@ -16,8 +15,11 @@ import javafx.scene.layout.VBox;
 public class TaskListView extends VBox {
 
     private final ListView<Task> taskList;
+    private final TaskManager taskManager;
 
-    public TaskListView() {
+    public TaskListView(TaskManager taskManager) {
+
+        this.taskManager = taskManager;
 
         taskList = new ListView<>();
 
@@ -59,7 +61,7 @@ public class TaskListView extends VBox {
 
                 } else {
 
-                    Label taskTitle = new Label(task.toString());
+                    Label taskTitle = new Label(task.getTitle());
 
                     String subject = task.getSubject();
 
@@ -112,16 +114,23 @@ public class TaskListView extends VBox {
 
                     checkBox.setOnAction(e -> {
 
-                        boolean completed = checkBox.isSelected();
+                        if (checkBox.isSelected()) {
+                            taskManager.completeTask(task);
+                        } else {
+                            task.setCompleted(false);
+                        }
 
-                        task.setCompleted(completed);
-
-                        updateTitleStyle(taskTitle, completed);
+                        updateTitleStyle(
+                                taskTitle,
+                                task.isCompleted()
+                        );
                     });
 
-                    deleteButton.setOnAction(e ->
-                            taskList.getItems().remove(task)
-                    );
+                    deleteButton.setOnAction(e -> {
+
+                        taskManager.removeTask(task);
+                        taskList.getItems().remove(task);
+                    });
 
                     setGraphic(taskRow);
                     setText(null);
@@ -172,4 +181,3 @@ public class TaskListView extends VBox {
         return taskList;
     }
 }
-

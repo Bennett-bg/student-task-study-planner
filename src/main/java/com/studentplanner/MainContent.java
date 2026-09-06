@@ -7,92 +7,125 @@ import javafx.scene.layout.VBox;
 
 public class MainContent extends VBox {
 
-private final Label welcome;
-private final Label pageTitle;
+    private final Label welcome;
+    private final Label pageTitle;
 
-private final Button showAddTaskButton;
-private final TaskForm taskForm;
-private final TaskListView taskList;
+    private final Button showAddTaskButton;
+    private final TaskForm taskForm;
+    private final TaskListView taskList;
 
-public MainContent() {
+    private final TaskManager taskManager;
 
-    setSpacing(15);
-    setPadding(new Insets(35));
+    public MainContent() {
 
-    welcome = new Label("Welcome to Monolith");
-    welcome.getStyleClass().add("welcome-label");
+        setSpacing(15);
+        setPadding(new Insets(35));
 
-    pageTitle = new Label("Today's Tasks");
-    pageTitle.getStyleClass().add("page-title");
+        // =========================
+        // DATA MANAGER
+        // =========================
 
-    showAddTaskButton = new Button("Add Task");
-    showAddTaskButton.getStyleClass().add("add-task-button");
+        taskManager = new TaskManager();
 
-    taskForm = new TaskForm();
-    taskList = new TaskListView();
+        // =========================
+        // PAGE CONTENT
+        // =========================
 
-    taskForm.setVisible(false);
-    taskForm.setManaged(false);
+        welcome = new Label("Welcome to Monolith");
+        welcome.getStyleClass().add("welcome-label");
 
-    getChildren().addAll(
-            welcome,
-            pageTitle,
-            showAddTaskButton,
-            taskForm,
-            taskList
-    );
-}
+        pageTitle = new Label("Today's Tasks");
+        pageTitle.getStyleClass().add("page-title");
 
-public void setupTaskSection() {
+        showAddTaskButton = new Button("Add Task");
+        showAddTaskButton.getStyleClass().add("add-task-button");
 
-    showAddTaskButton.setOnAction(e -> {
+        taskForm = new TaskForm();
 
-        taskForm.setVisible(true);
-        taskForm.setManaged(true);
-
-        showAddTaskButton.setVisible(false);
-        showAddTaskButton.setManaged(false);
-    });
-
-    taskForm.setOnTaskSaved(task -> {
-
-        taskList.getListView().getItems().add(task);
-
-        taskForm.clear();
+        taskList = new TaskListView(taskManager);
 
         taskForm.setVisible(false);
         taskForm.setManaged(false);
 
-        showAddTaskButton.setVisible(true);
-        showAddTaskButton.setManaged(true);
-    });
+        getChildren().addAll(
+                welcome,
+                pageTitle,
+                showAddTaskButton,
+                taskForm,
+                taskList
+        );
+    }
 
-    taskForm.setOnCancelled(() -> {
+    public void setupTaskSection() {
 
-        taskForm.clear();
+        // =========================
+        // SHOW ADD TASK FORM
+        // =========================
 
-        taskForm.setVisible(false);
-        taskForm.setManaged(false);
+        showAddTaskButton.setOnAction(e -> {
 
-        showAddTaskButton.setVisible(true);
-        showAddTaskButton.setManaged(true);
-    });
-}
+            taskForm.setVisible(true);
+            taskForm.setManaged(true);
 
-public void showToday() {
-    pageTitle.setText("Today's Tasks");
-}
+            showAddTaskButton.setVisible(false);
+            showAddTaskButton.setManaged(false);
+        });
 
-public void showUpcoming() {
-    pageTitle.setText("Upcoming");
-}
+        // =========================
+        // SAVE TASK
+        // =========================
 
-public void showCompleted() {
-    pageTitle.setText("Completed");
-}
+        taskForm.setOnTaskSaved(task -> {
 
-public void showSettings() {
-    pageTitle.setText("Settings");
-}
+            // Store the task in TaskManager
+            taskManager.addTask(task);
 
+            // Display the task in the UI
+            taskList.getListView().getItems().add(task);
+
+            // Clear and hide the form
+            taskForm.clear();
+
+            taskForm.setVisible(false);
+            taskForm.setManaged(false);
+
+            showAddTaskButton.setVisible(true);
+            showAddTaskButton.setManaged(true);
+        });
+
+        // =========================
+        // CANCEL
+        // =========================
+
+        taskForm.setOnCancelled(() -> {
+
+            taskForm.clear();
+
+            taskForm.setVisible(false);
+            taskForm.setManaged(false);
+
+            showAddTaskButton.setVisible(true);
+            showAddTaskButton.setManaged(true);
+        });
+    }
+
+    // =========================
+    // SIDEBAR PAGES
+    // =========================
+
+    public void showToday() {
+        pageTitle.setText("Today's Tasks");
+    }
+
+    public void showUpcoming() {
+        pageTitle.setText("Upcoming");
+    }
+
+    public void showCompleted() {
+        pageTitle.setText("Completed");
+    }
+
+    public void showSettings() {
+        pageTitle.setText("Settings");
+    }
 }
