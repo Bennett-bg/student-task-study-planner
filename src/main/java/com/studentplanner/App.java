@@ -15,6 +15,10 @@ public class App extends Application {
         Sidebar sidebar = new Sidebar();
         MainContent mainContent = new MainContent();
 
+        // =========================
+        // SIDEBAR NAVIGATION
+        // =========================
+
         sidebar.getHomeButton().setOnAction(e ->
                 mainContent.showDashboard()
         );
@@ -35,7 +39,25 @@ public class App extends Application {
                 mainContent.showSettings()
         );
 
+        // =========================
+        // SIDEBAR QUICK ADD
+        // =========================
+
+        sidebar.getQuickAddTaskButton().setOnAction(e ->
+                mainContent.showAddTask()
+        );
+
+        // =========================
+        // DASHBOARD QUICK ADD
+        // =========================
+
+        mainContent.setupDashboardQuickAdd();
+
         mainContent.setupTaskSection();
+
+        // =========================
+        // ROOT LAYOUT
+        // =========================
 
         root.setLeft(sidebar);
         root.setCenter(mainContent);

@@ -2,6 +2,7 @@ package com.studentplanner;
 
 import java.time.format.DateTimeFormatter;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -26,27 +27,72 @@ public class TaskListView extends VBox {
         taskList.setCellFactory(listView -> new ListCell<Task>() {
 
             private final CheckBox checkBox = new CheckBox();
+
+            private final Label taskTitle = new Label();
+            private final Label taskDetails = new Label();
+
+            private final VBox taskInfo = new VBox(
+                    3,
+                    taskTitle,
+                    taskDetails
+            );
+
             private final Button deleteButton = new Button("×");
 
-            private final VBox taskInfo = new VBox();
-            private final HBox taskRow = new HBox();
+            private final HBox taskRow = new HBox(
+                    12,
+                    checkBox,
+                    taskInfo,
+                    deleteButton
+            );
 
             {
+                // =========================
+                // TASK ROW
+                // =========================
+
                 taskRow.setAlignment(Pos.CENTER_LEFT);
-                taskRow.setSpacing(12);
+                taskRow.setPadding(new Insets(12, 14, 12, 14));
 
-                taskInfo.setSpacing(3);
+                taskRow.getStyleClass().add("task-row");
 
-                taskRow.getChildren().addAll(
-                        checkBox,
-                        taskInfo,
-                        deleteButton
-                );
-
+                // Keep information compact but allow it to expand
                 HBox.setHgrow(taskInfo, Priority.ALWAYS);
+
+                // =========================
+                // TASK TITLE
+                // =========================
+
+                taskTitle.getStyleClass().add("task-title");
+
+                // =========================
+                // TASK DETAILS
+                // =========================
+
+                taskDetails.getStyleClass().add("task-details");
+
+                // =========================
+                // DELETE BUTTON
+                // =========================
 
                 deleteButton.setFocusTraversable(false);
                 deleteButton.getStyleClass().add("delete-button");
+
+                deleteButton.setOnAction(e -> {
+
+                    Task task = getItem();
+
+                    if (task != null) {
+                        taskManager.removeTask(task);
+                        taskList.getItems().remove(task);
+                    }
+                });
+
+                // =========================
+                // CHECKBOX
+                // =========================
+
+                checkBox.setFocusTraversable(false);
             }
 
             @Override
@@ -61,57 +107,58 @@ public class TaskListView extends VBox {
 
                 } else {
 
-                    Label taskTitle = new Label(task.getTitle());
+                    // =========================
+                    // TASK TITLE
+                    // =========================
+
+                    taskTitle.setText(task.getTitle());
+
+                    // =========================
+                    // TASK DETAILS
+                    // =========================
 
                     String subject = task.getSubject();
 
-                    String details;
+                    String date = task.getDueDate().format(
+                            DateTimeFormatter.ofPattern("MMM d")
+                    );
+
+                    String priority = formatPriority(
+                            task.getPriority()
+                    );
 
                     if (subject == null || subject.isBlank()) {
 
-                        details =
-                                task.getDueDate().format(
-                                        DateTimeFormatter.ofPattern("MMM d")
-                                )
-                                + "  •  "
-                                + formatPriority(task.getPriority());
+                        taskDetails.setText(
+                                date + "  •  " + priority
+                        );
 
                     } else {
 
-                        details =
+                        taskDetails.setText(
                                 subject
                                 + "  •  "
-                                + task.getDueDate().format(
-                                        DateTimeFormatter.ofPattern("MMM d")
-                                )
+                                + date
                                 + "  •  "
-                                + formatPriority(task.getPriority());
+                                + priority
+                        );
                     }
 
-                    Label taskDetails = new Label(details);
+                    // =========================
+                    // COMPLETION STATE
+                    // =========================
 
-                    taskTitle.setStyle(
-                            "-fx-font-size: 15px;" +
-                            "-fx-font-weight: bold;"
+                    checkBox.setSelected(
+                            task.isCompleted()
                     );
 
-                    taskDetails.setStyle(
-                            "-fx-font-size: 12px;" +
-                            "-fx-text-fill: #888888;"
-                    );
-
-                    updateTitleStyle(taskTitle, task.isCompleted());
-
-                    taskInfo.getChildren().clear();
-
-                    taskInfo.getChildren().addAll(
+                    updateTitleStyle(
                             taskTitle,
-                            taskDetails
+                            task.isCompleted()
                     );
 
-                    checkBox.setText("");
-                    checkBox.setSelected(task.isCompleted());
-
+                    // Prevent duplicate listeners from
+                    // previous recycled cells
                     checkBox.setOnAction(e -> {
 
                         taskManager.setTaskCompleted(
@@ -125,12 +172,6 @@ public class TaskListView extends VBox {
                         );
                     });
 
-                    deleteButton.setOnAction(e -> {
-
-                        taskManager.removeTask(task);
-                        taskList.getItems().remove(task);
-                    });
-
                     setGraphic(taskRow);
                     setText(null);
                 }
@@ -139,28 +180,34 @@ public class TaskListView extends VBox {
 
         getChildren().add(taskList);
 
-        VBox.setVgrow(taskList, Priority.ALWAYS);
+        VBox.setVgrow(
+                taskList,
+                Priority.ALWAYS
+        );
     }
 
-    private void updateTitleStyle(Label title, boolean completed) {
+    private void updateTitleStyle(
+            Label title,
+            boolean completed
+    ) {
 
         if (completed) {
 
-            title.setStyle(
-                    "-fx-font-size: 15px;" +
-                    "-fx-font-weight: bold;" +
-                    "-fx-text-fill: #777777;" +
-                    "-fx-strikethrough: true;"
-            );
+            title.getStyleClass().remove("task-title");
+
+            if (!title.getStyleClass().contains("task-title-completed")) {
+                title.getStyleClass().add("task-title-completed");
+            }
 
         } else {
 
-            title.setStyle(
-                    "-fx-font-size: 15px;" +
-                    "-fx-font-weight: bold;" +
-                    "-fx-text-fill: #eeeeee;" +
-                    "-fx-strikethrough: false;"
+            title.getStyleClass().remove(
+                    "task-title-completed"
             );
+
+            if (!title.getStyleClass().contains("task-title")) {
+                title.getStyleClass().add("task-title");
+            }
         }
     }
 

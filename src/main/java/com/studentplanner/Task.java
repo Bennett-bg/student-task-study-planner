@@ -9,13 +9,21 @@ public class Task {
     private LocalDate dueDate;
     private Priority priority;
     private boolean completed;
+    private LocalDate completedDate;
 
-    public Task(String title, String subject, LocalDate dueDate, Priority priority) {
+    public Task(
+            String title,
+            String subject,
+            LocalDate dueDate,
+            Priority priority
+    ) {
+
         this.title = title;
         this.subject = subject;
         this.dueDate = dueDate;
         this.priority = priority;
         this.completed = false;
+        this.completedDate = null;
     }
 
     @Override
@@ -43,6 +51,10 @@ public class Task {
         return completed;
     }
 
+    public LocalDate getCompletedDate() {
+        return completedDate;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -60,7 +72,23 @@ public class Task {
     }
 
     public void setCompleted(boolean completed) {
+
         this.completed = completed;
+
+        if (completed) {
+
+            if (completedDate == null) {
+                completedDate = LocalDate.now();
+            }
+
+        } else {
+
+            completedDate = null;
+        }
+    }
+
+    public void setCompletedDate(LocalDate completedDate) {
+        this.completedDate = completedDate;
     }
 
     public enum Priority {
