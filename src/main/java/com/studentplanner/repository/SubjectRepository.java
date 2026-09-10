@@ -157,4 +157,4 @@ public class SubjectRepository {
                 resultSet.getString("color")
         );
     }
-}
+} 
