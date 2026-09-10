@@ -1,2 +1,4 @@
 target/
 tasks.dat
+monolith.db
+.vscode/
