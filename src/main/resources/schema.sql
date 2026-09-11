@@ -99,6 +99,12 @@ CREATE TABLE IF NOT EXISTS session_notes (
         ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS user_profile (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    display_name TEXT NOT NULL,
+    avatar TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS user_stats (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     xp INTEGER NOT NULL DEFAULT 0,
