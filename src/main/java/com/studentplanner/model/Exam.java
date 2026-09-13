@@ -1,3 +1,4 @@
+ 
 package com.studentplanner.model;
 
 public class Exam {
@@ -13,6 +14,10 @@ public class Exam {
     private Double marksObtained;
     private Double maximumMarks;
 
+    private boolean completed;
+    private String completedAt;
+
+    // Constructor for creating a new exam
     public Exam(
             String title,
             int subjectId,
@@ -20,7 +25,9 @@ public class Exam {
             String examTime,
             String syllabus,
             int preparationPercent,
-            String notes
+            String notes,
+            Double marksObtained,
+            Double maximumMarks
     ) {
         this.title = title;
         this.subjectId = subjectId;
@@ -29,8 +36,13 @@ public class Exam {
         this.syllabus = syllabus;
         this.preparationPercent = preparationPercent;
         this.notes = notes;
+        this.marksObtained = marksObtained;
+        this.maximumMarks = maximumMarks;
+        this.completed = false;
+        this.completedAt = null;
     }
 
+    // Constructor used when loading an exam from the database
     public Exam(
             int id,
             String title,
@@ -53,6 +65,37 @@ public class Exam {
         this.notes = notes;
         this.marksObtained = marksObtained;
         this.maximumMarks = maximumMarks;
+        this.completed = false;
+        this.completedAt = null;
+    }
+
+    // Constructor used when loading completion state as well
+    public Exam(
+            int id,
+            String title,
+            int subjectId,
+            String examDate,
+            String examTime,
+            String syllabus,
+            int preparationPercent,
+            String notes,
+            Double marksObtained,
+            Double maximumMarks,
+            boolean completed,
+            String completedAt
+    ) {
+        this.id = id;
+        this.title = title;
+        this.subjectId = subjectId;
+        this.examDate = examDate;
+        this.examTime = examTime;
+        this.syllabus = syllabus;
+        this.preparationPercent = preparationPercent;
+        this.notes = notes;
+        this.marksObtained = marksObtained;
+        this.maximumMarks = maximumMarks;
+        this.completed = completed;
+        this.completedAt = completedAt;
     }
 
     public int getId() {
@@ -135,12 +178,24 @@ public class Exam {
         this.maximumMarks = maximumMarks;
     }
 
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public String getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(String completedAt) {
+        this.completedAt = completedAt;
+    }
+
     public boolean hasResult() {
         return marksObtained != null && maximumMarks != null;
     }
-
-    @Override
-    public String toString() {
-        return title;
-    }
 }
+ 

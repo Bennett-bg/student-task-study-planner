@@ -19,10 +19,11 @@ public class AchievementRepository {
                     name,
                     description,
                     xp_reward,
+                    icon,
                     unlocked,
                     unlocked_at
                 )
-                VALUES (?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
         try (
@@ -35,8 +36,9 @@ public class AchievementRepository {
             statement.setString(1, achievement.getName());
             statement.setString(2, achievement.getDescription());
             statement.setInt(3, achievement.getXpReward());
-            statement.setInt(4, achievement.isUnlocked() ? 1 : 0);
-            statement.setString(5, achievement.getUnlockedAt());
+            statement.setString(4, achievement.getIcon());
+            statement.setInt(5, achievement.isUnlocked() ? 1 : 0);
+            statement.setString(6, achievement.getUnlockedAt());
 
             statement.executeUpdate();
 
@@ -53,7 +55,13 @@ public class AchievementRepository {
     public Achievement findById(int id) throws SQLException {
 
         String sql = """
-                SELECT id, name, description, xp_reward, unlocked, unlocked_at
+                SELECT id,
+                       name,
+                       description,
+                       xp_reward,
+                       icon,
+                       unlocked,
+                       unlocked_at
                 FROM achievements
                 WHERE id = ?
                 """;
@@ -77,7 +85,13 @@ public class AchievementRepository {
     public List<Achievement> findAll() throws SQLException {
 
         String sql = """
-                SELECT id, name, description, xp_reward, unlocked, unlocked_at
+                SELECT id,
+                       name,
+                       description,
+                       xp_reward,
+                       icon,
+                       unlocked,
+                       unlocked_at
                 FROM achievements
                 ORDER BY id
                 """;
@@ -100,7 +114,13 @@ public class AchievementRepository {
     public List<Achievement> findUnlocked() throws SQLException {
 
         String sql = """
-                SELECT id, name, description, xp_reward, unlocked, unlocked_at
+                SELECT id,
+                       name,
+                       description,
+                       xp_reward,
+                       icon,
+                       unlocked,
+                       unlocked_at
                 FROM achievements
                 WHERE unlocked = 1
                 ORDER BY unlocked_at, id
@@ -128,6 +148,7 @@ public class AchievementRepository {
                 SET name = ?,
                     description = ?,
                     xp_reward = ?,
+                    icon = ?,
                     unlocked = ?,
                     unlocked_at = ?
                 WHERE id = ?
@@ -140,9 +161,10 @@ public class AchievementRepository {
             statement.setString(1, achievement.getName());
             statement.setString(2, achievement.getDescription());
             statement.setInt(3, achievement.getXpReward());
-            statement.setInt(4, achievement.isUnlocked() ? 1 : 0);
-            statement.setString(5, achievement.getUnlockedAt());
-            statement.setInt(6, achievement.getId());
+            statement.setString(4, achievement.getIcon());
+            statement.setInt(5, achievement.isUnlocked() ? 1 : 0);
+            statement.setString(6, achievement.getUnlockedAt());
+            statement.setInt(7, achievement.getId());
 
             statement.executeUpdate();
         }
@@ -160,6 +182,7 @@ public class AchievementRepository {
             PreparedStatement statement = connection.prepareStatement(sql)
         ) {
             statement.setInt(1, id);
+
             statement.executeUpdate();
         }
     }
@@ -171,6 +194,7 @@ public class AchievementRepository {
                 resultSet.getString("name"),
                 resultSet.getString("description"),
                 resultSet.getInt("xp_reward"),
+                resultSet.getString("icon"),
                 resultSet.getInt("unlocked") == 1,
                 resultSet.getString("unlocked_at")
         );

@@ -1,3 +1,4 @@
+
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS semesters (
@@ -52,6 +53,8 @@ CREATE TABLE IF NOT EXISTS exams (
     notes TEXT,
     marks_obtained REAL,
     maximum_marks REAL,
+    completed INTEGER NOT NULL DEFAULT 0,
+    completed_at TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (subject_id)
@@ -119,6 +122,7 @@ CREATE TABLE IF NOT EXISTS achievements (
     name TEXT NOT NULL UNIQUE,
     description TEXT NOT NULL,
     xp_reward INTEGER NOT NULL DEFAULT 0,
+    icon TEXT NOT NULL DEFAULT 'DEFAULT',
     unlocked INTEGER NOT NULL DEFAULT 0,
     unlocked_at TEXT
 );
@@ -140,3 +144,4 @@ CREATE INDEX IF NOT EXISTS idx_focus_sessions_task
 
 CREATE INDEX IF NOT EXISTS idx_timetable_day
     ON timetable_entries(day_of_week);
+

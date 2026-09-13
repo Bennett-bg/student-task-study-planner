@@ -1,3 +1,4 @@
+
 package com.studentplanner.repository;
 
 import com.studentplanner.DatabaseConnection;
@@ -25,9 +26,11 @@ public class ExamRepository {
                     preparation_percent,
                     notes,
                     marks_obtained,
-                    maximum_marks
+                    maximum_marks,
+                    completed,
+                    completed_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection connection = DatabaseConnection.connect();
@@ -54,6 +57,9 @@ public class ExamRepository {
                 statement.setDouble(9, exam.getMaximumMarks());
             }
 
+            statement.setInt(10, exam.isCompleted() ? 1 : 0);
+            statement.setString(11, exam.getCompletedAt());
+
             statement.executeUpdate();
 
             try (ResultSet keys = statement.getGeneratedKeys()) {
@@ -71,7 +77,8 @@ public class ExamRepository {
         String sql = """
                 SELECT id, title, subject_id, exam_date, exam_time,
                        syllabus, preparation_percent, notes,
-                       marks_obtained, maximum_marks
+                       marks_obtained, maximum_marks,
+                       completed, completed_at
                 FROM exams
                 WHERE id = ?
                 """;
@@ -97,7 +104,8 @@ public class ExamRepository {
         String sql = """
                 SELECT id, title, subject_id, exam_date, exam_time,
                        syllabus, preparation_percent, notes,
-                       marks_obtained, maximum_marks
+                       marks_obtained, maximum_marks,
+                       completed, completed_at
                 FROM exams
                 ORDER BY exam_date, id
                 """;
@@ -121,7 +129,8 @@ public class ExamRepository {
         String sql = """
                 SELECT id, title, subject_id, exam_date, exam_time,
                        syllabus, preparation_percent, notes,
-                       marks_obtained, maximum_marks
+                       marks_obtained, maximum_marks,
+                       completed, completed_at
                 FROM exams
                 WHERE subject_id = ?
                 ORDER BY exam_date, id
@@ -157,7 +166,9 @@ public class ExamRepository {
                     preparation_percent = ?,
                     notes = ?,
                     marks_obtained = ?,
-                    maximum_marks = ?
+                    maximum_marks = ?,
+                    completed = ?,
+                    completed_at = ?
                 WHERE id = ?
                 """;
 
@@ -184,7 +195,10 @@ public class ExamRepository {
                 statement.setDouble(9, exam.getMaximumMarks());
             }
 
-            statement.setInt(10, exam.getId());
+            statement.setInt(10, exam.isCompleted() ? 1 : 0);
+            statement.setString(11, exam.getCompletedAt());
+
+            statement.setInt(12, exam.getId());
 
             statement.executeUpdate();
         }
@@ -216,6 +230,12 @@ public class ExamRepository {
         Double nullableMaximumMarks =
                 resultSet.wasNull() ? null : maximumMarks;
 
+        boolean completed =
+                resultSet.getInt("completed") == 1;
+
+        String completedAt =
+                resultSet.getString("completed_at");
+
         return new Exam(
                 resultSet.getInt("id"),
                 resultSet.getString("title"),
@@ -226,7 +246,10 @@ public class ExamRepository {
                 resultSet.getInt("preparation_percent"),
                 resultSet.getString("notes"),
                 nullableMarksObtained,
-                nullableMaximumMarks
+                nullableMaximumMarks,
+                completed,
+                completedAt
         );
     }
 }
+ 

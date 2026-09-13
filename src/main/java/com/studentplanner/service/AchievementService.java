@@ -25,28 +25,33 @@ public class AchievementService {
             int xpReward
     ) throws SQLException {
 
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Achievement name cannot be empty."
-            );
-        }
+        return createAchievement(
+                name,
+                description,
+                xpReward,
+                "DEFAULT"
+        );
+    }
 
-        if (description == null || description.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Achievement description cannot be empty."
-            );
-        }
+    public Achievement createAchievement(
+            String name,
+            String description,
+            int xpReward,
+            String icon
+    ) throws SQLException {
 
-        if (xpReward < 0) {
-            throw new IllegalArgumentException(
-                    "XP reward cannot be negative."
-            );
-        }
+        validateAchievement(
+                name,
+                description,
+                xpReward,
+                icon
+        );
 
         Achievement achievement = new Achievement(
                 name.trim(),
                 description.trim(),
-                xpReward
+                xpReward,
+                icon.trim()
         );
 
         return repository.save(achievement);
@@ -113,5 +118,173 @@ public class AchievementService {
                         achievement.getName().equalsIgnoreCase(name)
                                 && achievement.isUnlocked()
                 );
+    }
+
+    /**
+     * Creates Monolith's default achievement set if
+     * those achievements do not already exist.
+     *
+     * This method is safe to call multiple times.
+     */
+    public void initializeDefaultAchievements()
+            throws SQLException {
+
+        List<Achievement> existingAchievements =
+                repository.findAll();
+
+        createIfMissing(
+                existingAchievements,
+                "First Step",
+                "Complete your first task",
+                25,
+                "FIRST_STEP"
+        );
+
+        createIfMissing(
+                existingAchievements,
+                "Getting Serious",
+                "Complete 10 tasks",
+                50,
+                "GETTING_SERIOUS"
+        );
+
+        createIfMissing(
+                existingAchievements,
+                "Task Machine",
+                "Complete 50 tasks",
+                100,
+                "TASK_MACHINE"
+        );
+
+        createIfMissing(
+                existingAchievements,
+                "Focused",
+                "Complete 5 focus sessions",
+                50,
+                "FOCUSED"
+        );
+
+        createIfMissing(
+                existingAchievements,
+                "Deep Work",
+                "Complete 25 focus sessions",
+                100,
+                "DEEP_WORK"
+        );
+
+        createIfMissing(
+                existingAchievements,
+                "Locked In",
+                "Complete 100 focus sessions",
+                250,
+                "LOCKED_IN"
+        );
+
+        createIfMissing(
+                existingAchievements,
+                "On a Roll",
+                "Maintain a 3-day streak",
+                50,
+                "ON_A_ROLL"
+        );
+
+        createIfMissing(
+                existingAchievements,
+                "Dedicated",
+                "Maintain a 7-day streak",
+                100,
+                "DEDICATED"
+        );
+
+        createIfMissing(
+                existingAchievements,
+                "Unstoppable",
+                "Maintain a 30-day streak",
+                250,
+                "UNSTOPPABLE"
+        );
+
+        createIfMissing(
+                existingAchievements,
+                "Exam Ready",
+                "Complete your first exam",
+                50,
+                "EXAM_READY"
+        );
+
+        createIfMissing(
+                existingAchievements,
+                "Academic Grinder",
+                "Complete 5 exams",
+                100,
+                "ACADEMIC_GRINDER"
+        );
+
+        createIfMissing(
+                existingAchievements,
+                "Monolith Veteran",
+                "Reach Level 10",
+                250,
+                "MONOLITH_VETERAN"
+        );
+    }
+
+    private void createIfMissing(
+            List<Achievement> existingAchievements,
+            String name,
+            String description,
+            int xpReward,
+            String icon
+    ) throws SQLException {
+
+        boolean alreadyExists = existingAchievements
+                .stream()
+                .anyMatch(achievement ->
+                        achievement.getName()
+                                .equalsIgnoreCase(name)
+                );
+
+        if (!alreadyExists) {
+            Achievement achievement = createAchievement(
+                    name,
+                    description,
+                    xpReward,
+                    icon
+            );
+
+            existingAchievements.add(achievement);
+        }
+    }
+
+    private void validateAchievement(
+            String name,
+            String description,
+            int xpReward,
+            String icon
+    ) {
+
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Achievement name cannot be empty."
+            );
+        }
+
+        if (description == null || description.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Achievement description cannot be empty."
+            );
+        }
+
+        if (xpReward < 0) {
+            throw new IllegalArgumentException(
+                    "XP reward cannot be negative."
+            );
+        }
+
+        if (icon == null || icon.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Achievement icon cannot be empty."
+            );
+        }
     }
 }
