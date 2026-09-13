@@ -145,3 +145,21 @@ CREATE INDEX IF NOT EXISTS idx_focus_sessions_task
 CREATE INDEX IF NOT EXISTS idx_timetable_day
     ON timetable_entries(day_of_week);
 
+
+CREATE TABLE IF NOT EXISTS gamification_rewards (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_type TEXT NOT NULL,
+    source_id INTEGER NOT NULL,
+    reward_type TEXT NOT NULL,
+    xp_amount INTEGER NOT NULL,
+    awarded_at TEXT NOT NULL,
+
+    UNIQUE (
+        source_type,
+        source_id,
+        reward_type
+    )
+);
+
+CREATE INDEX IF NOT EXISTS idx_gamification_rewards_source
+    ON gamification_rewards(source_type, source_id);
